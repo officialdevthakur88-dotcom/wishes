@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Birthday Frame</title>
+    <style>
+        /* --- GENERAL STYLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe6ea;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- CONTROLS SECTION (For User Input) --- */
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            z-index: 100;
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .controls h3 { margin-top: 0; color: #d6336c; }
+        
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #d6336c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #a61e4d; }
+
+        /* --- THE BIRTHDAY CARD FRAME --- */
+        .container {
+            position: relative;
+            margin: 30px auto;
+            padding: 20px;
+            background: #fff;
+            border: 10px solid white;
+            outline: 4px solid #ffb7c5; /* Rose edge */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            transform: rotate(-2deg); /* Slight tilt for artistic look */
+        }
+
+        h1.title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #d6336c;
+            margin: 10px 0;
+            text-shadow: 2px 2px 0px #ffb7c5;
+        }
+
+        .message-box {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* --- PHOTO GRID --- */
+        .photo-frame {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .photo-frame img:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        /* Placeholder styles if no images uploaded */
+        .photo-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 0.8rem;
+            border: 2px dashed #ccc;
+        }
+
+        /* --- ANIMATIONS (Decorations) --- */
+        
+        /* Balloons */
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 50px;
+            background: red; /* Default rose color */
+            border-radius: 50%;
+            opacity: 0.8;
+            z-index: 1;
+            animation: flyUp 10s linear infinite;
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid red;
+        }
+
+        /* Falling Petals */
+        .petal {
+            position: absolute;
+            top: -10px;
+            width: 15px;
+            height: 15px;
+            background: #ff4d6d;
+            border-radius: 100% 0 100% 0;
+            opacity: 0.8;
+            z-index: 1;
+            animation: fall 8s linear infinite;
+        }
+
+        @keyframes flyUp {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(20px); }
+            100% { bottom: 110vh; transform: translateX(-20px); }
+        }
+
+        @keyframes fall {
+            0% { top: -10px; transform: translateX(0) rotate(0deg); opacity: 1; }
+            100% { top: 110vh; transform: translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- DECORATION LAYER (Behind content) -->
+    <div id="decorations"></div>
+
+    <!-- INPUT FORM -->
+    <div class="controls">
+        <h3>Create Birthday Card</h3>
+        <label>Select Multiple Photos:</label><br>
+        <input type="file" id="imageInput" multiple accept="image/*" onchange="loadImages()"><br><br>
+        
+        <label>Name:</label>
+        <input type="text" id="nameInput" placeholder="e.g., Sarah" oninput="updateName()">
+        
+        <label>From:</label>
+        <input type="text" id="senderInput" placeholder="e.g., John" oninput="updateSender()">
+        
+        <br>
+        <button onclick="triggerConfetti()">Generate Wishes!</button>
+    </div>
+
+    <!-- THE CARD -->
+    <div class="container">
+        <h1 class="title">Happy Birthday!</h1>
+        <h2 id="displayName" style="font-weight:300; color:#333;">[Name]</h2>
+        
+        <div class="photo-frame" id="photoFrame">
+            <!-- Placeholders -->
+            <div class="photo-placeholder">Photo 1</div>
+            <div class="photo-placeholder">Photo 2</div>
+            <div class="photo-placeholder">Photo 3</div>
+            <div class="photo-placeholder">Photo 4</div>
+            <div class="photo-placeholder">Photo 5</div>
+            <div class="photo-placeholder">Photo 6</div>
+        </div>
+
+        <p class="message-box">
+            Wishing you a day filled with love, laughter, and all the beauty of roses.<br>
+            - <span id="displaySender">Someone Special</span>
+        </p>
+    </div>
+
+    <script>
+        // 1. Handle Text Inputs
+        function updateName() {
+            const name = document.getElementById('nameInput').value;
+            document.getElementById('displayName').innerText = name ? name : "[Name]";
+        }
+
+        function updateSender() {
+            const sender = document.getElementById('senderInput').value;
+            document.getElementById('displaySender').innerText = sender ? sender : "Someone Special";
+        }
+
+        // 2. Handle Multiple Image Uploads
+        function loadImages() {
+            const input = document.getElementById('imageInput');
+            const frame = document.getElementById('photoFrame');
+            frame.innerHTML = ''; // Clear placeholders
+
+            if (input.files) {
+                const files = Array.from(input.files);
+                
+                // Limit to 4 photos for neatness, or loop them
+                files.slice(0, 6).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        frame.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        // 3. Create Flying Balloons and Falling Petals
+        function createDecorations() {
+            const container = document.getElementById('decorations');
+            
+            // Create 15 Balloons
+            for(let i=0; i<15; i++) {
+                let bal = document.createElement('div');
+                bal.classList.add('balloon');
+                // Randomize colors (Roses: Red/Pink)
+                const colors = ['#d6336c', '#ff4d6d', '#ff85a1', '#e85d75'];
+                bal.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                bal.style.left = Math.random() * 100 + 'vw';
+                bal.style.animationDuration = (Math.random() * 5 + 5) + 's'; // 5 to 10s
+                bal.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(bal);
+            }
+
+            // Create 30 Rose Petals
+            for(let i=0; i<30; i++) {
+                let petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+                // Slight color variation
+                petal.style.backgroundColor = Math.random() > 0.5 ? '#ff0f54' : '#ffb7c5';
+                container.appendChild(petal);
+            }
+        }
+
+        // Trigger animation manually or on load
+        createDecorations();
+
+    </script>
+</body>
+</html>
